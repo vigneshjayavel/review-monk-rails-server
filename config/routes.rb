@@ -1,5 +1,9 @@
 ReviewTemple::Application.routes.draw do
   
+  get "cart/review_order"
+
+  get "cart/payment"
+
   resources :users do
     collection do
       post 'register'
