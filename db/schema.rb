@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140807163642) do
+ActiveRecord::Schema.define(:version => 20140807235454) do
 
   create_table "gcm_devices", :force => true do |t|
     t.string   "registration_id",    :null => false
@@ -54,10 +54,10 @@ ActiveRecord::Schema.define(:version => 20140807163642) do
     t.string   "email"
     t.text     "description"
     t.integer  "device_id"
-    t.decimal  "gps_latitude",    :precision => 10, :scale => 0
-    t.decimal  "gps_longitude",   :precision => 10, :scale => 0
-    t.datetime "created_at",                                     :null => false
-    t.datetime "updated_at",                                     :null => false
+    t.decimal  "gps_latitude",    :precision => 40, :scale => 30
+    t.decimal  "gps_longitude",   :precision => 40, :scale => 30
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
     t.string   "work_place"
     t.string   "native_location"
     t.string   "language"

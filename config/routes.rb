@@ -2,12 +2,21 @@ ReviewTemple::Application.routes.draw do
   
   get "cart/review_order"
 
-  get "cart/payment"
+  resources :cart do
+    collection do
+      post 'payment'
+    end
+  end
 
   resources :users do
     collection do
       post 'register'
       post 'attach_product'
+      post 'send_review_request'
+      post 'send_review_response'
+      post 'search_users'
+      post 'list_user_products'
+      post 'owner_details'
 
       get 'test_notification'
     end

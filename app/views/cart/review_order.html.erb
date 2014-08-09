@@ -28,7 +28,9 @@
 			</div>
 			
 
-			<%= form_tag "payment",:id=>"checkoutform", :method=>"get" do %>
+			<%= form_tag "payment",:id=>"checkoutform", :method=>"post", :controller => "cart" do %>
+
+			<input type="hidden" name="user_email" value="vigneshjayavel@gmail.com" />
 
 			<div class="col-md-7 col-sm-12 text-left">
 				<ul>
@@ -41,24 +43,18 @@
 						<span class="quantity"><input type="hidden" value="1"/>1</span>
 						<span class="itemName"><input type="hidden" name="product[0][name]" value="Moto G"/>Moto G</span>
 						<span class="price">
-							<div class="btn-group" data-toggle="buttons-radio">
-  								<button type="button" name="yes1" class="btn btn-primary status" value="yes">Yes</button>
-  								<button type="button" name="later1" class="btn btn-primary status" value="later">Later</button>
-  								<button type="button" name="no1" class="btn btn-primary status" value="no">No</button>
-  								<input type="hidden" name="product[1][status]" value="">
-							</div>
+							<input type="radio" name="product[0][status]" value="yes">Yes &nbsp;
+							<input type="radio" name="product[0][status]" value="later">Later &nbsp;
+							<input type="radio" name="product[0][status]" value="no">No &nbsp;
 						</span>
 					</li>
 					<li class="row">
 						<span class="quantity"><input type="hidden" value="1"/>1</span>
-						<span class="itemName"><input type="hidden" name="product[1][name]" value="Moto G"/>Moto G</span>
+						<span class="itemName"><input type="hidden" name="product[1][name]" value="Moto E"/>Moto E</span>
 						<span class="price">
-							<div class="btn-group" data-toggle="buttons-radio">
-  								<button type="button" name="yes1" class="btn btn-primary status" value="yes">Yes</button>
-  								<button type="button" name="later1" class="btn btn-primary status" value="later">Later</button>
-  								<button type="button" name="no1" class="btn btn-primary status" value="no">No</button>
-  								<input type="hidden" name="product[1][status]" value="">
-							</div>
+							<input type="radio" name="product[1][status]" value="yes">Yes &nbsp;
+							<input type="radio" name="product[1][status]" value="later">Later &nbsp;
+							<input type="radio" name="product[1][status]" value="no">No &nbsp;
 						</span>
 					</li>
 					<!--<li class="row">

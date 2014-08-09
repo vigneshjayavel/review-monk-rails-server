@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
   require 'push_notification'
+  require 'search_users'
 
   def show
     Rails.logger.debug "===============> inside show of UsersController <==============="
@@ -29,39 +30,89 @@ class UsersController < ApplicationController
   end
 
   def attach_product
-    Rails.logger.debug "===============> inside register of UsersController <==============="
+    Rails.logger.debug "===============> inside attach_product of UsersController <==============="
     Rails.logger.debug "===============> JSON.parse(params[:attach_product]) : #{JSON.parse(params[:attach_product])} <==============="
 
     attach_data = JSON.parse(params[:attach_product])
 
-    attach_data[:brand] = attach_data[:brand].present? ? attach_data[:brand] : "---"
+    user = User.find_by_email(attach_data["email"])
 
-    user = User.find_by_email(attach_data[:email])
+    product = Product.find_by_name(attach_data["name"])
 
-    product = Product.find_by_name_and_brand(attach_data[:name], attach_data[:brand])
-    product ||= user.products.build({ :name => attach_data[:name], :brand => attach_data[:brand] })
-
-    if user.products.include?(product)
-      process_result 'exists'
-    else
+    if product.present? and !user.products.include?(product)
       user_prod = user.user_products.build
       user_prod.product = product
-
-      if user_prod.save!
-        process_result 'success'
-      else
-        process_result 'failure'
-      end
+      user_prod.save!
+    else
+      user.products.create({ :name => attach_data["name"] })
     end
+
+    process_result 'success'
 
   end
 
-  def test_notification
-    user = User.find(4)
+  def send_review_request
+    Rails.logger.debug "===============> inside send_review_request of UsersController <==============="
+    Rails.logger.debug "===============> JSON.parse(params[:review_request]) : #{JSON.parse(params[:review_request])} <==============="
 
-    PushNotification.send_notification(user.device, "Testing sample notification")
+    request_data = JSON.parse(params[:review_request])
 
-    process_result 'sucess'
+    product = Product.find_by_name(request_data["product_name"])
+    receiver = User.find_by_email(request_data["receiver_email"])
+    sender = User.find_by_email(request_data["sender_email"])
+    request_msg = request_data["message"]
+
+    Rails.logger.debug "product : #{product.inspect}"
+
+    PushNotification.send_notification(sender, receiver, product, request_msg)
+
+    process_result 'success'
+  end
+
+  def send_review_response
+    Rails.logger.debug "===============> inside send_review_request of UsersController <==============="
+    Rails.logger.debug "===============> JSON.parse(params[:review_response]) : #{JSON.parse(params[:review_response])} <==============="
+
+    response_data = JSON.parse(params[:review_response])
+
+    receiver = User.find_by_email(response_data["receiver_email"])
+    sender = User.find_by_email(response_data["sender_email"])
+    response_msg = response_data["status"].downcase == "accept" ? "#{sender.name} accepted your review request. Further details will be sent via mail" : "#{sender.name} rejected your review request."
+
+    PushNotification.send_notification(sender, receiver, nil, response_msg)
+
+    process_result 'success'
+  end
+
+  def search_users
+    Rails.logger.debug "===============> inside search_users of UsersController <==============="
+    Rails.logger.debug "===============> JSON.parse(params[:search]) : #{JSON.parse(params[:search])} <==============="
+
+    search_data = JSON.parse(params[:search])
+
+    user = User.find_by_email(search_data["user_email"])
+
+    result = SearchUsers.start_searching(user.gps_latitude, user.gps_longitude, search_data["product_name"], 
+                                                                user.work_place, user.native_location, user.language)
+
+    render :json => result.to_json
+
+  end
+
+  def list_user_products
+    Rails.logger.debug "===============> inside list_user_products of UsersController <==============="
+
+    user = User.find_by_email(params[:email])
+
+    render :json => { :products => user.products }.to_json
+  end
+
+  def owner_details
+    Rails.logger.debug "===============> inside owner_details of UsersController <==============="
+
+    user = User.find_by_email(params[:email])
+
+    render :json => { :user => user }.to_json
   end
 
   def process_result status = nil
@@ -74,4 +125,13 @@ class UsersController < ApplicationController
     end
   end
   
+  def test_notification
+    user = User.find(4)
+    product = Product.first
+
+    PushNotification.send_notification(user, product, "Testing sample notification")
+
+    process_result 'sucess'
+  end
+
 end
